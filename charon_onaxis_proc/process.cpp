@@ -139,7 +139,7 @@ bool process::check_ofile_write(bool overwrite_param)
     // Redundant check (don't want to accidentally overwrite an important file)
     if (delete_check == 'y' || delete_check == 'Y') {
 	std::cout << "Are you sure you want to overwrite '"
-		  << name_out.c_str() << "'? [y/N]";
+		  << name_out.c_str() << "'? [y/N]\n";
 	// Get input
         redundant_check = gather_input();
 	if (redundant_check == 'y' || redundant_check == 'Y')
@@ -410,16 +410,54 @@ void process::psd_cut(std::vector<int>& peak_bounds, double num_stddevs = 2)
     std::cout << "Number of points: " << n << "\n\n";
     pileup_cut = new TCutG("cut",n);
 
+    // Apply moving average to top
+    std::vector<double> y_top_new {};
+    const int window {5};
+    for (std::size_t i=0; i<y_top.size(); ++i) {
+    double sum {0};
+	double count {0};
+	int start_index = i-window;
+	if (start_index < 0) {
+	    y_top_new.push_back(y_top.at(i));
+	    continue;
+	    //start_index = 0;
+	}
+	for (std::size_t j=start_index; j<=i; ++j) {
+	    sum += y_top.at(j);
+	    ++count;
+	}
+	y_top_new.push_back(sum / count);
+    }
+
+    std::cout << "\n Averaging bottom points\n\n";
+    // Apply moving average to bottom
+    std::vector<double> y_bottom_new{};
+    for (std::size_t i=0; i<y_bottom.size(); ++i) {
+	double sum {0};
+	double count {0};
+	int start_index = i-window;
+	if (start_index < 0) {
+	    y_bottom_new.push_back(y_bottom.at(i));
+	    continue;
+	    //start_index = 0;
+	}
+	for (std::size_t j=start_index; j<=i; ++j) {
+	    sum += y_bottom.at(j);
+	    ++count;
+	}
+	y_bottom_new.push_back(sum / count);
+    }
+
     // Fill the cut with points
     for (std::size_t i=0; i<x.size(); ++i) {
 	// Start with the top points
-	pileup_cut->SetPoint(i,x.at(i),y_top.at(i));
+	pileup_cut->SetPoint(i,x.at(i),y_top_new.at(i));
     }
     for (std::size_t i=0; i<x.size(); ++i) {
 	// Now get the bottom points
 	// Read from x and y backwards
 	pileup_cut->SetPoint(i+x.size(),x.at(x.size()-1-i)
-			     ,y_bottom.at(x.size()-1-i));
+			     ,y_bottom_new.at(x.size()-1-i));
     }
     pileup_cut->SetPoint(n-1,x.at(0),y_top.at(0));
 
