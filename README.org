@@ -1,0 +1,24 @@
+* Radiography Processing with the Cyclotron
+This is a set of tools for processing data from radiographic
+measurements with the cyclotron. 
+* Tools
+** On-Axis Processing
+This C++ tool takes a ROOT data file (time sorted) and processes a
+digitizer channel for an on-axis detector. It produces a calibrated
+histogram, PSD plot, pileup corrected histogram, and a pileup cut
+(TCutG). For more information, use the "-h/--help" option when running
+the program.
+
+To build, go into the directory and type the following:
+#+BEGIN_SRC 
+make
+make clean
+#+END_SRC
+
+To learn more about using the program:
+#+BEGIN_SRC 
+./charon_onaxis --help
+#+END_SRC
+
+*** Tasks [/]
+    - [ ] add smoothing to PSD cut
