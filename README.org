@@ -20,5 +20,5 @@ To learn more about using the program:
 ./charon_onaxis --help
 #+END_SRC
 
-*** Tasks [/]
-    - [ ] add smoothing to PSD cut
+*** Tasks [1/1]
+    - [X] add smoothing to PSD cut
