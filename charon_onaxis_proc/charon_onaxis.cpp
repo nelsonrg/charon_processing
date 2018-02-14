@@ -95,12 +95,13 @@ int main(int argc, const char* argv[])
 	    std::string temp_file {argv[i+1]};
 	    read_bounds(temp_file, temp);
 
-	    std::cout << temp.size();
+	    //std::cout << temp.size();
 
 	    if (temp.size() == 2*num_peaks) {
 		// load custom file into vector
 		peak_bounds.clear();
-		read_bounds(temp_file, peak_bounds);
+		peak_bound_file = temp_file;
+		read_bounds(peak_bound_file, peak_bounds);
 	    }
 	    else {
 		// keep defaults
