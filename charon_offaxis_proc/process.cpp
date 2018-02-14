@@ -198,11 +198,11 @@ void process::calibrate(double slope, double intercept)
     for (ULong64_t entry = 0; entry<num_entries; ++entry) {
 	tree->GetEntry(entry);
 
-	if (entry%100000 == 0) {
+	if (entry%1000000 == 0) {
 	    std::cout << "Processing event " << entry << " of "
 		      << num_entries << " ("
 		      << (double)entry/(double)num_entries*100.0<<"%)"
-		      <<"\n";
+		      << std::endl;
 	}
 	
 	E_calibrated = energy * slope + intercept;
@@ -242,7 +242,7 @@ void process::psd_cut(double slope, double intercept, double num_stddevs = 2)
     for (int xbin=0; xbin<=h_PSD_dirty->GetNbinsX(); ++xbin) {
 	if (xbin % 100 == 0) {
 	    std::cout << static_cast<double>(xbin)/h_PSD_dirty->GetNbinsX()*100
-		      << "%\n\t";
+		      << "%\n" << std::flush << "\t";
 	}
 
 	/** Uncomment for a coarser fit  
