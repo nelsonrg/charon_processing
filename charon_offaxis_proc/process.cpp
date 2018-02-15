@@ -210,15 +210,21 @@ void process::calibrate(double slope, double intercept)
 	if (channel != channel_num)
 	    continue;
 
-	if (pileup_cut != 0 &&
-	    pileup_cut->IsInside(E_calibrated,tail/energy)) {
+	if (pileup_cut == 0) {
+	    h_dirty->Fill(E_calibrated);
+	    h_PSD_dirty->Fill(E_calibrated,tail/energy);
+	}
+	else if (pileup_cut != 0 &&
+		 pileup_cut->IsInside(E_calibrated,tail/energy)) {
+	    
 	    h_clean->Fill(E_calibrated);
 	    h_PSD_clean->Fill(E_calibrated,tail/energy);
 	}
 	else {
-	    h_dirty->Fill(E_calibrated);
-	    h_PSD_dirty->Fill(E_calibrated,tail/energy);
+	    std::cout << "ERROR! See line process.cpp:224!\n";
 	}
+
+	
     }
 };
 
