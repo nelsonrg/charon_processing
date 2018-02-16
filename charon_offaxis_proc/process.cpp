@@ -220,11 +220,6 @@ void process::calibrate(double slope, double intercept)
 	    h_clean->Fill(E_calibrated);
 	    h_PSD_clean->Fill(E_calibrated,tail/energy);
 	}
-	else {
-	    std::cout << "ERROR! See line process.cpp:224!\n";
-	}
-
-	
     }
 };
 

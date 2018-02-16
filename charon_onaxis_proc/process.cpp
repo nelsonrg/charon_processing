@@ -305,9 +305,6 @@ void process::time_cut(std::vector<int>& peak_bounds)
 		    h_clean->Fill(E_calibrated);
 		    h_PSD_clean->Fill(E_calibrated,tail/energy);
 		}
-		else {
-		    std::cout << "ERROR! See line process.cpp:309!\n";
-		}
 	    }
 	}
 
