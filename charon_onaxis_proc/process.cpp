@@ -296,17 +296,18 @@ void process::time_cut(std::vector<int>& peak_bounds)
 	    E_calibrated = slope*energy + intercept;
       
 	    if (channel == channel_num) {
-		if (pileup_cut != 0 &&
-		    pileup_cut->IsInside(E_calibrated,tail/energy)) {
-		    h_clean->Fill(E_calibrated);
-		    h_PSD_clean->Fill(E_calibrated,tail/energy);
-		}
-
 		if (pileup_cut == 0) {
 		    h_dirty->Fill(E_calibrated);
 		    h_PSD_dirty->Fill(E_calibrated,tail/energy);
 		}
-    
+		else if (pileup_cut != 0 &&
+		    pileup_cut->IsInside(E_calibrated,tail/energy)) {
+		    h_clean->Fill(E_calibrated);
+		    h_PSD_clean->Fill(E_calibrated,tail/energy);
+		}
+		else {
+		    std::cout << "ERROR! See line process.cpp:309!\n";
+		}
 	    }
 	}
 
