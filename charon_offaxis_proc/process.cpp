@@ -237,7 +237,7 @@ void process::psd_cut(double slope, double intercept, double num_stddevs = 2)
     //        1 --> center
     //        2 --> standard deviation
     //        3 --> offset
-    double last_par [] {0,0,0.05,0};
+    double last_par [] {0,0,0.1,0};
 
     for (int xbin=0; xbin<=h_PSD_dirty->GetNbinsX(); ++xbin) {
 	if (xbin % 100 == 0) {
@@ -347,7 +347,7 @@ void process::psd_cut(double slope, double intercept, double num_stddevs = 2)
 	pileup_cut->SetPoint(i+x.size(),x.at(x.size()-1-i)
 			     ,y_bottom_new.at(x.size()-1-i));
     }
-    pileup_cut->SetPoint(n-1,x.at(0),y_top.at(0));
+    pileup_cut->SetPoint(n-1,x.at(0),y_top_new.at(0));
 
     // Now apply the PSD cut
     std::cout << "\n\nApplying PSD Cut for Pileup Correction.\n\n";
