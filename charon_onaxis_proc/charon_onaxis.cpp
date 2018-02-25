@@ -39,7 +39,7 @@ void read_bounds(std::string& file_name, std::vector<int>& bounds)
 	}
     }
     else {
-	std::cerr << "Cannot open peak bounds file!";
+	std::cerr << "Cannot open peak bounds file, " << file_name << "\n";
     }
 
     f_stream.close();
