@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <getopt.h>
 
 static void show_usage(std::string name)
 {
@@ -11,20 +12,20 @@ static void show_usage(std::string name)
 	      << "useful histograms.\n\n"
 	      << "Usage: " << name << " [OPTION]...\n\n"
               << "Options:\n"
-              << "-h,  --help           \t show this help message\n"
-              << "-if, --input <file>   \t ROOT input file name "
+	      << "-i, --input <file>   \t ROOT input file name "
 	      <<                            "[default: default_input.root]\n"
-	      << "-of, --output <file>  \t ROOT output file name "
+	      << "-o, --output <file>  \t ROOT output file name "
 	      <<                            "[default: default_output.root]\n"
-	      << "-ch, --channel <int>  \t digitizer channel "
+	      << "-c, --channel <int>  \t digitizer channel "
 	      <<                            "[default: 0]\n"
-	      << "-sd, --stddevs <dble> \t number of standard deviations for "
+	      << "-s, --stddevs <dble> \t number of standard deviations for "
 	      <<                          "pileup cut\n\t\t\t\t[default: 2.0]\n"
-	      << "-pf, --peakfile <file> \t text file with peak bounds for "
+	      << "-p, --peakfile <file> \t text file with peak bounds for "
 	      <<                             "calibration\n"
 	      <<                       "\t\t\t\t[default: default_bounds.txt]\n"
-	      << "-ow, --overwrite      \t enables overwriting the output file "
+	      << "-w, --overwrite      \t enables overwriting the output file "
 	      <<                            "[default: off]\n"
+	      << "-h,  --help           \t show this help message\n"
               << std::endl;
 };
 
@@ -45,7 +46,7 @@ void read_bounds(std::string& file_name, std::vector<int>& bounds)
     f_stream.close();
 };
 
-int main(int argc, const char* argv[])
+int main(int argc, char **argv)
 {
     // Gather commandline input
     std::cout << "########################################"
@@ -65,34 +66,42 @@ int main(int argc, const char* argv[])
     bool overwrite_param {false}; // enforces overwriting output file if it exists
                                   // WARNING. This can be dangerous.
     
+    static const struct option long_options[] = {
+	{"help", no_argument, 0, 'h'},
+	{"input", required_argument, 0, 'i'},
+	{"output", required_argument, 0, 'o'},
+	{"channel", required_argument, 0, 'c'},
+	{"stddevs", required_argument, 0, 's'},
+	{"peakfile", required_argument, 0, 'p'},
+	{"overwrite", no_argument, 0, 'w'}
+    };
 
-    // Define variables from command line input
-    for (int i = 1; i < argc; ++i) {
-	std::string option = argv[i];
+    std::string option_string {"i:o:c:s:p:wh"};
 
-	if (option == "-h" || option == "--help") {
-	    show_usage(argv[0]);
-	    return 1;
-	}
-	else if (option == "-if" || option == "--input") {
-	    name_input = argv[i+1];
-	    ++i;
-	}
-	else if (option == "-of" || option == "--output") {
-	    name_output = argv[i+1];
-	    ++i;
-	}
-	else if (option == "-ch" || option == "--channel") {
-	    channel = std::atoi(argv[i+1]);
-	    ++i;
-	}
-	else if (option == "-sd" || option == "--stddevs") {
-	    num_stddevs = std::stod(argv[i+1]);
-	    ++i;
-	}
-	else if (option == "-pf" || option == "--peakfile") {
+    // Parse input
+    int opt;
+    int option_index {0};
+    opt = getopt_long(argc, argv, option_string.c_str(), long_options,
+		      &option_index);
+    while (opt != -1) {
+	switch (opt)
+	{
+	case 'i':
+	    name_input = optarg;
+	    break;
+	case 'o':
+	    name_output = optarg;
+	    break;
+	case 'c':
+	    channel = std::atoi(optarg);
+	    break;
+	case 's':
+	    num_stddevs = std::stod(optarg);
+	    break;
+	case 'p':
+	{
 	    std::vector<int> temp {};
-	    std::string temp_file {argv[i+1]};
+	    std::string temp_file {optarg};
 	    read_bounds(temp_file, temp);
 
 	    //std::cout << temp.size();
@@ -109,12 +118,23 @@ int main(int argc, const char* argv[])
 			  << " was not read properly\n\n";
 	    }
 	    
-	    ++i;
+	    break;
 	}
-	else if (option == "-ow" || option == "--overwrite") {
+	case 'w':
 	    overwrite_param = true;
-	    ++i;
+	    break;
+	case 'h':
+	    show_usage(argv[0]);
+	    return 1;
+	case '?':
+	    show_usage(argv[0]);
+	    return 1;
+	default:
+	    break;
 	}
+
+	opt = getopt_long(argc, argv, option_string.c_str(), long_options,
+			  &option_index);
     }
 
     if (peak_bounds.size() != 2*num_peaks) {
