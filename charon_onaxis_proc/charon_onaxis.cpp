@@ -73,7 +73,8 @@ int main(int argc, char **argv)
 	{"channel", required_argument, 0, 'c'},
 	{"stddevs", required_argument, 0, 's'},
 	{"peakfile", required_argument, 0, 'p'},
-	{"overwrite", no_argument, 0, 'w'}
+	{"overwrite", no_argument, 0, 'w'},
+	{} // deals with unknown parameters
     };
 
     std::string option_string {"i:o:c:s:p:wh"};
