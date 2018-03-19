@@ -531,6 +531,11 @@ void process::apply_scaling(std::string& file_name)
     scale_factor = 1/integral;
 
     // Apply scaling to histograms (y-axis->Counts/A)
+    h_dirty->Sumw2();
+    h_clean->Sumw2();
+    h_PSD_dirty->Sumw2();
+    h_PSD_clean->Sumw2();
+    
     h_dirty->Scale(scale_factor);
     h_clean->Scale(scale_factor);
     h_PSD_dirty->Scale(scale_factor);
