@@ -503,7 +503,7 @@ void process::apply_scaling(std::string& file_name)
     double integral {0}; // Amperes
     int counter {1};
     // The following is the correction for a 50ms sample rate 
-    double sample_correction {20.0};
+    double sample_rate {0.05};
     double time {0.00};
     std::vector<double> charge_measured {0}; // amperes
     std::vector<double> time_measured {0}; // seconds
@@ -517,10 +517,10 @@ void process::apply_scaling(std::string& file_name)
 	while (std::getline(line_stream, value, ','))
 	{
 	    if (counter % 3 == 0) {
-		integral += (std::stod(value)/sample_correction);
+		integral += (std::stod(value)*sample_rate);
 		charge_measured.push_back(std::stod(value));
 		time_measured.push_back(time);
-		time += 0.05;
+		time += sample_rate;
 	    }
 	    ++counter;
 	}
@@ -537,10 +537,10 @@ void process::apply_scaling(std::string& file_name)
     h_PSD_clean->Scale(scale_factor);
 
     // Re-label y-axis
-    h_dirty->GetYaxis()->SetTitle("Counts/A");
-    h_clean->GetYaxis()->SetTitle("Counts/A");
-    h_PSD_dirty->GetZaxis()->SetTitle("Counts/A");
-    h_PSD_clean->GetZaxis()->SetTitle("Counts/A");
+    h_dirty->GetYaxis()->SetTitle("Counts/C");
+    h_clean->GetYaxis()->SetTitle("Counts/C");
+    h_PSD_dirty->GetZaxis()->SetTitle("Counts/C");
+    h_PSD_clean->GetZaxis()->SetTitle("Counts/C");
 
     // Create TGraph of the charge measured by the RBD
     charge_graph = new TGraph(time_measured.size(),
