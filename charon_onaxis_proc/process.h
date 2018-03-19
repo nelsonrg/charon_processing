@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TGraph.h"
 #include "TTree.h"
 #include <vector>
 
@@ -23,6 +24,7 @@ public:
     void time_cut(std::vector<int>& peak_bounds);
     void temp_func();
     void psd_cut(std::vector<int>& peak_bounds, double num_stddevs);
+    void apply_scaling(std::string& file_name);
     void write_out(bool overwrite_param);
     
 private:
@@ -33,6 +35,7 @@ private:
     TTree* tree;
     ULong64_t num_entries;
     int channel_num;
+    double scale_factor;
 
     // Histograms
     TH2D h_temp;
@@ -41,8 +44,10 @@ private:
     TH2D* h_PSD_dirty;
     TH2D* h_PSD_clean;
     TCutG* pileup_cut;
+    TGraph* charge_graph;
 };
 
+// Non member function 
 char gather_input();
 
 #endif

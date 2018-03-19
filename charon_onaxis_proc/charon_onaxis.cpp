@@ -18,6 +18,8 @@ static void show_usage(std::string name)
 	      <<                            "[default: default_output.root]\n"
 	      << "-c, --channel <int>  \t digitizer channel "
 	      <<                            "[default: 0]\n"
+	      << "-l, --scale <file>   \t RBD charge file to scale the spectra"
+	      <<                          " [default: 0]\n"
 	      << "-s, --stddevs <dble> \t number of standard deviations for "
 	      <<                          "pileup cut\n\t\t\t\t[default: 2.0]\n"
 	      << "-p, --peakfile <file> \t text file with peak bounds for "
@@ -56,6 +58,7 @@ int main(int argc, char **argv)
     std::string name_input {"default_input.root"};
     std::string name_output {"default_output.root"};
     int channel {0};
+    std::string scale_file_name; // default is "empty"
     double num_stddevs {2};
     
     std::vector<int> peak_bounds {};
@@ -71,13 +74,14 @@ int main(int argc, char **argv)
 	{"input", required_argument, 0, 'i'},
 	{"output", required_argument, 0, 'o'},
 	{"channel", required_argument, 0, 'c'},
+	{"scale", required_argument, 0, 'l'},
 	{"stddevs", required_argument, 0, 's'},
 	{"peakfile", required_argument, 0, 'p'},
 	{"overwrite", no_argument, 0, 'w'},
 	{} // deals with unknown parameters
     };
 
-    std::string option_string {"i:o:c:s:p:wh"};
+    std::string option_string {"i:o:c:l:s:p:wh"};
 
     // Parse input
     int opt;
@@ -95,6 +99,9 @@ int main(int argc, char **argv)
 	    break;
 	case 'c':
 	    channel = std::atoi(optarg);
+	    break;
+	case 'l':
+	    scale_file_name = optarg;
 	    break;
 	case 's':
 	    num_stddevs = std::stod(optarg);
@@ -163,6 +170,7 @@ int main(int argc, char **argv)
     std::cout << "\nInput file:\t\t" << name_input << "\n"
 	      << "\nOutput file:\t\t" << name_output << "\n"
 	      << "\nChannel number:\t\t" << channel << "\n"
+	      << "\nScaling File:\t\t" << scale_file_name << "\n"
 	      << "\nStandard deviations:\t" << num_stddevs << "\n"
 	      << "\nPeak bound file:\t" << peak_bound_file << "\n"
 	      << "\nOverwrite output:\t" << std::boolalpha << overwrite_param << "\n"
@@ -204,6 +212,8 @@ int main(int argc, char **argv)
     P->time_cut(peak_bounds);
     //P->temp_func();
     P->psd_cut(peak_bounds, num_stddevs);
+    if (!scale_file_name.empty())
+	P->apply_scaling(scale_file_name);
     P->write_out(overwrite_param);
 
     return 0;

@@ -5,6 +5,7 @@
 #include "TLinearFitter.h"
 #include "TMath.h"
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <vector>
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,11 +37,13 @@ process::process(std::string& name_input, std::string& name_output,
     ,tree {0}
     ,num_entries {0}
     ,channel_num {channel}
+    ,scale_factor {1}
     ,h_dirty {0}
     ,h_clean {0}
     ,h_PSD_dirty {0}
-    ,h_PSD_clean {0} 
+    ,h_PSD_clean {0}
     ,pileup_cut {0}
+    ,charge_graph {0}
 {
 };
 
@@ -169,12 +172,15 @@ void process::write_out(bool overwrite_param)
     h_clean->Write();
     h_PSD_clean->Write();
     pileup_cut->Write();
+    if (charge_graph != 0)
+	charge_graph->Write();
 
     delete h_dirty;
     delete h_clean;
     delete h_PSD_dirty;
     delete h_PSD_clean;
     delete pileup_cut;
+    delete charge_graph;
 
     f_output->Write();
     f_output->Close();
@@ -486,3 +492,60 @@ void process::psd_cut(std::vector<int>& peak_bounds, double num_stddevs = 2)
     h_clean->Scale(scale_factor);
 }
 
+// Computes and applies scaling factor to private member histograms
+// file_name is the name of the RBD output file
+// It assumes a three column, csv input and a sample rate of 50ms
+void process::apply_scaling(std::string& file_name)
+{
+    // Read beam current file 
+    std::ifstream infile;
+    std::string line;
+    double integral {0}; // Amperes
+    int counter {1};
+    // The following is the correction for a 50ms sample rate 
+    double sample_correction {20.0};
+    double time {0.00};
+    std::vector<double> charge_measured {0}; // amperes
+    std::vector<double> time_measured {0}; // seconds
+
+    infile.open(file_name);
+    
+    while (std::getline(infile, line))
+    {
+	std::stringstream line_stream(line);
+        std::string value;
+	while (std::getline(line_stream, value, ','))
+	{
+	    if (counter % 3 == 0) {
+		integral += (std::stod(value)/sample_correction);
+		charge_measured.push_back(std::stod(value));
+		time_measured.push_back(time);
+		time += 0.05;
+	    }
+	    ++counter;
+	}
+    }
+    infile.close();
+
+    // assign value to private member variable 
+    scale_factor = 1/integral;
+
+    // Apply scaling to histograms (y-axis->Counts/A)
+    h_dirty->Scale(scale_factor);
+    h_clean->Scale(scale_factor);
+    h_PSD_dirty->Scale(scale_factor);
+    h_PSD_clean->Scale(scale_factor);
+
+    // Re-label y-axis
+    h_dirty->GetYaxis()->SetTitle("Counts/A");
+    h_clean->GetYaxis()->SetTitle("Counts/A");
+    h_PSD_dirty->GetZaxis()->SetTitle("Counts/A");
+    h_PSD_clean->GetZaxis()->SetTitle("Counts/A");
+
+    // Create TGraph of the charge measured by the RBD
+    charge_graph = new TGraph(time_measured.size(),
+			      &(time_measured[0]),
+			      &(charge_measured[0]));
+    charge_graph->GetXaxis()->SetTitle("Time [s]");
+    charge_graph->GetYaxis()->SetTitle("Charge [A]");
+}
