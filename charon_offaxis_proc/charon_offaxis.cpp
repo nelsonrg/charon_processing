@@ -111,7 +111,7 @@ int main(int argc, const char* argv[])
     std::cout << "\nInput file:\t\t" << name_input << "\n"
 	      << "\nOutput file:\t\t" << name_output << "\n"
 	      << "\nChannel number:\t\t" << channel << "\n"
-	      << "\nScaling File:\t\t" << scale_file_name << "\n";
+	      << "\nScaling File:\t\t" << scale_file_name << "\n"
 	      << "\nIntercept:\t\t" << intercept << "\n"
 	      << "\nSlope:\t\t\t" << slope << "\n"
 	      << "\nStandard deviations:\t" << num_stddevs << "\n"
