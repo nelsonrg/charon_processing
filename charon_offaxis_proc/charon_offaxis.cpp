@@ -20,6 +20,8 @@ static void show_usage(std::string name)
 	      <<                            "[default: default_output.root]\n"
 	      << "-ch, --channel <int>  \t digitizer channel "
 	      <<                            "[default: 0]\n"
+	      << "-l, --scale <file>   \t RBD charge file to scale the spectra"
+	      <<                          " [default: 0]\n"
 	      << "-sd, --stddevs <dble> \t number of standard deviations for "
 	      <<                          "pileup cut\n\t\t\t\t[default: 2.0]\n"
 	      << "-ow, --overwrite      \t enables overwriting the output file "
@@ -56,6 +58,7 @@ int main(int argc, const char* argv[])
     std::string name_input {"default_input.root"};
     std::string name_output {"default_output.root"};
     int channel {0};
+    std::string scale_file_name; // default is empty string
     double num_stddevs {2};
             
     bool overwrite_param {false}; // enforces overwriting output file if it exists
@@ -90,6 +93,10 @@ int main(int argc, const char* argv[])
 	    channel = std::atoi(argv[i+1]);
 	    ++i;
 	}
+	else if (option == "-l" || option == "--scale") {
+	    scale_file_name = argv[i+1];
+	    ++i;
+	}
 	else if (option == "-sd" || option == "--stddevs") {
 	    num_stddevs = std::stod(argv[i+1]);
 	    ++i;
@@ -104,6 +111,7 @@ int main(int argc, const char* argv[])
     std::cout << "\nInput file:\t\t" << name_input << "\n"
 	      << "\nOutput file:\t\t" << name_output << "\n"
 	      << "\nChannel number:\t\t" << channel << "\n"
+	      << "\nScaling File:\t\t" << scale_file_name << "\n";
 	      << "\nIntercept:\t\t" << intercept << "\n"
 	      << "\nSlope:\t\t\t" << slope << "\n"
 	      << "\nStandard deviations:\t" << num_stddevs << "\n"
@@ -146,6 +154,8 @@ int main(int argc, const char* argv[])
     P->calibrate(slope, intercept);
     //P->temp_func();
     P->psd_cut(slope, intercept, num_stddevs);
+    if (!scale_file_name.empty())
+	P->apply_scaling(scale_file_name);
     P->write_out(overwrite_param);
 
     return 0;

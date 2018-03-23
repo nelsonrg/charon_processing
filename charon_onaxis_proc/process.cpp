@@ -387,7 +387,7 @@ void process::psd_cut(std::vector<int>& peak_bounds, double num_stddevs = 2)
 
 	// Check fit
 	int n_entries = proj.Integral(1,proj.GetNbinsX());
-	if (n_entries < 500)
+	if (n_entries < 100)
 	    continue; // This number might need to be changed 
 
 	if (par[2] < 0.005)  
