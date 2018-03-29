@@ -177,13 +177,6 @@ void process::write_out(bool overwrite_param)
     if (charge_graph != 0)
 	charge_graph->Write();
 
-    delete h_dirty;
-    delete h_clean;
-    delete h_PSD_dirty;
-    delete h_PSD_clean;
-    delete pileup_cut;
-    delete charge_graph;
-
     f_output->Write();
     f_output->Close();
 };

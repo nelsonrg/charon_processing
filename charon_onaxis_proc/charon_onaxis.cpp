@@ -216,5 +216,6 @@ int main(int argc, char **argv)
 	P->apply_scaling(scale_file_name);
     P->write_out(overwrite_param);
 
+    delete P;
     return 0;
 };
