@@ -56,6 +56,8 @@ process::~process()
     delete h_clean;
     delete h_PSD_dirty;
     delete h_PSD_clean;
+    delete pileup_cut;
+    delete charge_graph;
 };
 
 // Initial setup (defining some private members)
