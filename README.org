@@ -1,6 +1,11 @@
 * Radiography Processing with the Cyclotron
 This is a set of tools for processing data from radiographic
-measurements with the cyclotron. 
+measurements with the proton cyclotron at MIT. 
+
+These tools were used to analyze experimental data for my Master's
+thesis in cargo radiography and active interrogation. I will include a
+link to the thesis once it is published on DSpace. 
+
 * Tools
 ** On-Axis Processing
 This C++ tool takes a ROOT data file (time sorted) and processes a
@@ -19,6 +24,3 @@ To learn more about using the program:
 #+BEGIN_SRC 
 ./charon_onaxis --help
 #+END_SRC
-
-*** Tasks [1/1]
-    - [X] add smoothing to PSD cut
